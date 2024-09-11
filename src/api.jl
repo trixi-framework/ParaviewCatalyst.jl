@@ -18,13 +18,17 @@ const LONG_MAX = typemax(Clong)
 const LONG_MIN = typemin(Clong)
 const ULONG_MAX = typemax(Culong)
 
-const conduit_node = Cvoid
+mutable struct conduit_node_impl end
+
+const conduit_node = conduit_node_impl
 
 function catalyst_conduit_about(cnode)
     ccall((:catalyst_conduit_about, libcatalyst), Cvoid, (Ptr{conduit_node},), cnode)
 end
 
-const conduit_datatype = Cvoid
+mutable struct conduit_datatype_impl end
+
+const conduit_datatype = conduit_datatype_impl
 
 const conduit_signed_long = Clong
 
@@ -40,6 +44,10 @@ end
 
 function catalyst_conduit_datatype_element_index(cdatatype, idx)
     ccall((:catalyst_conduit_datatype_element_index, libcatalyst), conduit_index_t, (Ptr{conduit_datatype}, conduit_index_t), cdatatype, idx)
+end
+
+function catalyst_conduit_datatype_endianness(cdatatype)
+    ccall((:catalyst_conduit_datatype_endianness, libcatalyst), conduit_index_t, (Ptr{conduit_datatype},), cdatatype)
 end
 
 function catalyst_conduit_datatype_endianness_matches_machine(cdatatype)
@@ -192,6 +200,11 @@ end
 
 function catalyst_conduit_datatype_offset(cdatatype)
     ccall((:catalyst_conduit_datatype_offset, libcatalyst), conduit_index_t, (Ptr{conduit_datatype},), cdatatype)
+end
+
+# no prototype is found for this function at conduit_datatype.h:36:19, please use with caution
+function catalyst_conduit_datatype_sizeof_index_t()
+    ccall((:catalyst_conduit_datatype_sizeof_index_t, libcatalyst), Cint, ())
 end
 
 function catalyst_conduit_datatype_stride(cdatatype)
@@ -462,7 +475,7 @@ function catalyst_conduit_node_contiguous_with_node(cnode, cother)
     ccall((:catalyst_conduit_node_contiguous_with_node, libcatalyst), Cint, (Ptr{conduit_node}, Ptr{conduit_node}), cnode, cother)
 end
 
-# no prototype is found for this function at conduit_node.h:41:29, please use with caution
+# no prototype is found for this function at conduit_node.h:42:29, please use with caution
 function catalyst_conduit_node_create()
     ccall((:catalyst_conduit_node_create, libcatalyst), Ptr{conduit_node}, ())
 end
@@ -695,6 +708,14 @@ function catalyst_conduit_node_fetch_path_as_unsigned_short_ptr(cnode, path)
     ccall((:catalyst_conduit_node_fetch_path_as_unsigned_short_ptr, libcatalyst), Ptr{Cushort}, (Ptr{conduit_node}, Ptr{Cchar}), cnode, path)
 end
 
+function catalyst_conduit_node_fetch_path_data_ptr(cnode, path)
+    ccall((:catalyst_conduit_node_fetch_path_data_ptr, libcatalyst), Ptr{Cvoid}, (Ptr{conduit_node}, Ptr{Cchar}), cnode, path)
+end
+
+function catalyst_conduit_node_fetch_path_element_ptr(cnode, path, idx)
+    ccall((:catalyst_conduit_node_fetch_path_element_ptr, libcatalyst), Ptr{Cvoid}, (Ptr{conduit_node}, Ptr{Cchar}, conduit_index_t), cnode, path, idx)
+end
+
 function catalyst_conduit_node_generate(cnode, schema, protocol, data)
     ccall((:catalyst_conduit_node_generate, libcatalyst), Cvoid, (Ptr{conduit_node}, Ptr{Cchar}, Ptr{Cchar}, Ptr{Cvoid}), cnode, schema, protocol, data)
 end
@@ -733,6 +754,10 @@ end
 
 function catalyst_conduit_node_load(cnode, path, protocol)
     ccall((:catalyst_conduit_node_load, libcatalyst), Cvoid, (Ptr{conduit_node}, Ptr{Cchar}, Ptr{Cchar}), cnode, path, protocol)
+end
+
+function catalyst_conduit_node_move(cnode_a, cnode_b)
+    ccall((:catalyst_conduit_node_move, libcatalyst), Cvoid, (Ptr{conduit_node}, Ptr{conduit_node}), cnode_a, cnode_b)
 end
 
 function catalyst_conduit_node_name(cnode)
@@ -781,6 +806,10 @@ end
 
 function catalyst_conduit_node_rename_child(cnode, current_name, new_name)
     ccall((:catalyst_conduit_node_rename_child, libcatalyst), Cvoid, (Ptr{conduit_node}, Ptr{Cchar}, Ptr{Cchar}), cnode, current_name, new_name)
+end
+
+function catalyst_conduit_node_reset(cnode)
+    ccall((:catalyst_conduit_node_reset, libcatalyst), Cvoid, (Ptr{conduit_node},), cnode)
 end
 
 function catalyst_conduit_node_save(cnode, path, protocol)
@@ -1153,6 +1182,10 @@ end
 
 function catalyst_conduit_node_set_path_double_ptr_detailed(cnode, path, data, num_elements, offset, stride, element_bytes, endianness)
     ccall((:catalyst_conduit_node_set_path_double_ptr_detailed, libcatalyst), Cvoid, (Ptr{conduit_node}, Ptr{Cchar}, Ptr{Cdouble}, conduit_index_t, conduit_index_t, conduit_index_t, conduit_index_t, conduit_index_t), cnode, path, data, num_elements, offset, stride, element_bytes, endianness)
+end
+
+function catalyst_conduit_node_set_path_external_char8_str(cnode, path, value)
+    ccall((:catalyst_conduit_node_set_path_external_char8_str, libcatalyst), Cvoid, (Ptr{conduit_node}, Ptr{Cchar}, Ptr{Cchar}), cnode, path, value)
 end
 
 function catalyst_conduit_node_set_path_external_char_ptr(cnode, path, data, num_elements)
@@ -1775,6 +1808,42 @@ function catalyst_conduit_node_set_unsigned_short_ptr_detailed(cnode, data, num_
     ccall((:catalyst_conduit_node_set_unsigned_short_ptr_detailed, libcatalyst), Cvoid, (Ptr{conduit_node}, Ptr{Cushort}, conduit_index_t, conduit_index_t, conduit_index_t, conduit_index_t, conduit_index_t), cnode, data, num_elements, offset, stride, element_bytes, endianness)
 end
 
+function catalyst_conduit_node_swap(cnode_a, cnode_b)
+    ccall((:catalyst_conduit_node_swap, libcatalyst), Cvoid, (Ptr{conduit_node}, Ptr{conduit_node}), cnode_a, cnode_b)
+end
+
+function catalyst_conduit_node_to_json(cnode)
+    ccall((:catalyst_conduit_node_to_json, libcatalyst), Ptr{Cchar}, (Ptr{conduit_node},), cnode)
+end
+
+function catalyst_conduit_node_to_json_with_options(cnode, copts)
+    ccall((:catalyst_conduit_node_to_json_with_options, libcatalyst), Ptr{Cchar}, (Ptr{conduit_node}, Ptr{conduit_node}), cnode, copts)
+end
+
+function catalyst_conduit_node_to_string(cnode)
+    ccall((:catalyst_conduit_node_to_string, libcatalyst), Ptr{Cchar}, (Ptr{conduit_node},), cnode)
+end
+
+function catalyst_conduit_node_to_string_with_options(cnode, copts)
+    ccall((:catalyst_conduit_node_to_string_with_options, libcatalyst), Ptr{Cchar}, (Ptr{conduit_node}, Ptr{conduit_node}), cnode, copts)
+end
+
+function catalyst_conduit_node_to_summary_string(cnode)
+    ccall((:catalyst_conduit_node_to_summary_string, libcatalyst), Ptr{Cchar}, (Ptr{conduit_node},), cnode)
+end
+
+function catalyst_conduit_node_to_summary_string_with_options(cnode, copts)
+    ccall((:catalyst_conduit_node_to_summary_string_with_options, libcatalyst), Ptr{Cchar}, (Ptr{conduit_node}, Ptr{conduit_node}), cnode, copts)
+end
+
+function catalyst_conduit_node_to_yaml(cnode)
+    ccall((:catalyst_conduit_node_to_yaml, libcatalyst), Ptr{Cchar}, (Ptr{conduit_node},), cnode)
+end
+
+function catalyst_conduit_node_to_yaml_with_options(cnode, copts)
+    ccall((:catalyst_conduit_node_to_yaml_with_options, libcatalyst), Ptr{Cchar}, (Ptr{conduit_node}, Ptr{conduit_node}), cnode, copts)
+end
+
 function catalyst_conduit_node_total_bytes_allocated(cnode)
     ccall((:catalyst_conduit_node_total_bytes_allocated, libcatalyst), conduit_index_t, (Ptr{conduit_node},), cnode)
 end
@@ -1852,22 +1921,6 @@ const conduit_index32_t = conduit_int32
     CONDUIT_ENDIANNESS_LITTLE_ID = 2
 end
 
-function conduit_datatype_endianness(cdatatype)
-    ccall((:conduit_datatype_endianness, libcatalyst), conduit_index_t, (Ptr{conduit_datatype},), cdatatype)
-end
-
-function conduit_node_set_path_external_char8_str(cnode, path, value)
-    ccall((:conduit_node_set_path_external_char8_str, libcatalyst), Cvoid, (Ptr{conduit_node}, Ptr{Cchar}, Ptr{Cchar}), cnode, path, value)
-end
-
-function conduit_node_fetch_path_data_ptr(cnode, path)
-    ccall((:conduit_node_fetch_path_data_ptr, libcatalyst), Ptr{Cvoid}, (Ptr{conduit_node}, Ptr{Cchar}), cnode, path)
-end
-
-function conduit_node_fetch_path_element_ptr(cnode, path, idx)
-    ccall((:conduit_node_fetch_path_element_ptr, libcatalyst), Ptr{Cvoid}, (Ptr{conduit_node}, Ptr{Cchar}, conduit_index_t), cnode, path, idx)
-end
-
 @cenum catalyst_status::UInt32 begin
     catalyst_status_ok = 0
     catalyst_status_error_no_implementation = 1
@@ -1876,6 +1929,7 @@ end
     catalyst_status_error_not_catalyst = 4
     catalyst_status_error_incomplete = 5
     catalyst_status_error_unsupported_version = 6
+    catalyst_status_error_conduit_mismatch = 7
 end
 
 function catalyst_initialize(params)
@@ -1902,10 +1956,6 @@ function catalyst_conduit_blueprint_about(cnode)
     ccall((:catalyst_conduit_blueprint_about, libcatalyst), Cvoid, (Ptr{conduit_node},), cnode)
 end
 
-function catalyst_conduit_blueprint_mcarray_examples_xyz(mcarray_type, npts, cres)
-    ccall((:catalyst_conduit_blueprint_mcarray_examples_xyz, libcatalyst), Cvoid, (Ptr{Cchar}, conduit_index_t, Ptr{conduit_node}), mcarray_type, npts, cres)
-end
-
 function catalyst_conduit_blueprint_mcarray_is_interleaved(cnode)
     ccall((:catalyst_conduit_blueprint_mcarray_is_interleaved, libcatalyst), Cint, (Ptr{conduit_node},), cnode)
 end
@@ -1926,32 +1976,16 @@ function catalyst_conduit_blueprint_mcarray_verify_sub_protocol(protocol, cnode,
     ccall((:catalyst_conduit_blueprint_mcarray_verify_sub_protocol, libcatalyst), Cint, (Ptr{Cchar}, Ptr{conduit_node}, Ptr{conduit_node}), protocol, cnode, cinfo)
 end
 
-function catalyst_conduit_blueprint_mesh_examples_basic(mesh_type, nx, ny, nz, cres)
-    ccall((:catalyst_conduit_blueprint_mesh_examples_basic, libcatalyst), Cvoid, (Ptr{Cchar}, conduit_index_t, conduit_index_t, conduit_index_t, Ptr{conduit_node}), mesh_type, nx, ny, nz, cres)
-end
-
-function catalyst_conduit_blueprint_mesh_examples_braid(mesh_type, nx, ny, nz, cres)
-    ccall((:catalyst_conduit_blueprint_mesh_examples_braid, libcatalyst), Cvoid, (Ptr{Cchar}, conduit_index_t, conduit_index_t, conduit_index_t, Ptr{conduit_node}), mesh_type, nx, ny, nz, cres)
-end
-
-function catalyst_conduit_blueprint_mesh_examples_julia(nx, ny, x_min, x_max, y_min, y_max, c_re, c_im, cres)
-    ccall((:catalyst_conduit_blueprint_mesh_examples_julia, libcatalyst), Cvoid, (conduit_index_t, conduit_index_t, conduit_float64, conduit_float64, conduit_float64, conduit_float64, conduit_float64, conduit_float64, Ptr{conduit_node}), nx, ny, x_min, x_max, y_min, y_max, c_re, c_im, cres)
-end
-
-function catalyst_conduit_blueprint_mesh_examples_misc(mesh_type, nx, ny, nz, cres)
-    ccall((:catalyst_conduit_blueprint_mesh_examples_misc, libcatalyst), Cvoid, (Ptr{Cchar}, conduit_index_t, conduit_index_t, conduit_index_t, Ptr{conduit_node}), mesh_type, nx, ny, nz, cres)
-end
-
-function catalyst_conduit_blueprint_mesh_examples_polytess(nlevels, cres)
-    ccall((:catalyst_conduit_blueprint_mesh_examples_polytess, libcatalyst), Cvoid, (conduit_index_t, Ptr{conduit_node}), nlevels, cres)
-end
-
-function catalyst_conduit_blueprint_mesh_examples_spiral(ndomains, cres)
-    ccall((:catalyst_conduit_blueprint_mesh_examples_spiral, libcatalyst), Cvoid, (conduit_index_t, Ptr{conduit_node}), ndomains, cres)
+function catalyst_conduit_blueprint_mesh_flatten(cmesh, coptions, coutput)
+    ccall((:catalyst_conduit_blueprint_mesh_flatten, libcatalyst), Cvoid, (Ptr{conduit_node}, Ptr{conduit_node}, Ptr{conduit_node}), cmesh, coptions, coutput)
 end
 
 function catalyst_conduit_blueprint_mesh_generate_index(cmesh, ref_path, num_domains, cindex_out)
     ccall((:catalyst_conduit_blueprint_mesh_generate_index, libcatalyst), Cvoid, (Ptr{conduit_node}, Ptr{Cchar}, conduit_index_t, Ptr{conduit_node}), cmesh, ref_path, num_domains, cindex_out)
+end
+
+function catalyst_conduit_blueprint_mesh_partition(cmesh, coptions, coutput)
+    ccall((:catalyst_conduit_blueprint_mesh_partition, libcatalyst), Cvoid, (Ptr{conduit_node}, Ptr{conduit_node}, Ptr{conduit_node}), cmesh, coptions, coutput)
 end
 
 function catalyst_conduit_blueprint_mesh_verify(cnode, cinfo)
@@ -1960,6 +1994,14 @@ end
 
 function catalyst_conduit_blueprint_mesh_verify_sub_protocol(protocol, cnode, cinfo)
     ccall((:catalyst_conduit_blueprint_mesh_verify_sub_protocol, libcatalyst), Cint, (Ptr{Cchar}, Ptr{conduit_node}, Ptr{conduit_node}), protocol, cnode, cinfo)
+end
+
+function catalyst_conduit_blueprint_table_verify(cnode, cinfo)
+    ccall((:catalyst_conduit_blueprint_table_verify, libcatalyst), Cint, (Ptr{conduit_node}, Ptr{conduit_node}), cnode, cinfo)
+end
+
+function catalyst_conduit_blueprint_table_verify_sub_protocol(protocol, cnode, cinfo)
+    ccall((:catalyst_conduit_blueprint_table_verify_sub_protocol, libcatalyst), Cint, (Ptr{Cchar}, Ptr{conduit_node}, Ptr{conduit_node}), protocol, cnode, cinfo)
 end
 
 function catalyst_conduit_blueprint_verify(protocol, cnode, cinfo)
@@ -1971,6 +2013,8 @@ const conduit_about = catalyst_conduit_about
 const conduit_datatype_element_bytes = catalyst_conduit_datatype_element_bytes
 
 const conduit_datatype_element_index = catalyst_conduit_datatype_element_index
+
+const conduit_datatype_endianness = catalyst_conduit_datatype_endianness
 
 const conduit_datatype_endianness_matches_machine = catalyst_conduit_datatype_endianness_matches_machine
 
@@ -2047,6 +2091,8 @@ const conduit_datatype_name_destroy = catalyst_conduit_datatype_name_destroy
 const conduit_datatype_number_of_elements = catalyst_conduit_datatype_number_of_elements
 
 const conduit_datatype_offset = catalyst_conduit_datatype_offset
+
+const conduit_datatype_sizeof_index_t = catalyst_conduit_datatype_sizeof_index_t
 
 const conduit_datatype_stride = catalyst_conduit_datatype_stride
 
@@ -2280,6 +2326,10 @@ const conduit_node_fetch_path_as_unsigned_short = catalyst_conduit_node_fetch_pa
 
 const conduit_node_fetch_path_as_unsigned_short_ptr = catalyst_conduit_node_fetch_path_as_unsigned_short_ptr
 
+const conduit_node_fetch_path_data_ptr = catalyst_conduit_node_fetch_path_data_ptr
+
+const conduit_node_fetch_path_element_ptr = catalyst_conduit_node_fetch_path_element_ptr
+
 const conduit_node_generate = catalyst_conduit_node_generate
 
 const conduit_node_generate_external = catalyst_conduit_node_generate_external
@@ -2299,6 +2349,8 @@ const conduit_node_is_data_external = catalyst_conduit_node_is_data_external
 const conduit_node_is_root = catalyst_conduit_node_is_root
 
 const conduit_node_load = catalyst_conduit_node_load
+
+const conduit_node_move = catalyst_conduit_node_move
 
 const conduit_node_name = catalyst_conduit_node_name
 
@@ -2323,6 +2375,8 @@ const conduit_node_remove_child_by_name = catalyst_conduit_node_remove_child_by_
 const conduit_node_remove_path = catalyst_conduit_node_remove_path
 
 const conduit_node_rename_child = catalyst_conduit_node_rename_child
+
+const conduit_node_reset = catalyst_conduit_node_reset
 
 const conduit_node_save = catalyst_conduit_node_save
 
@@ -2509,6 +2563,8 @@ const conduit_node_set_path_double = catalyst_conduit_node_set_path_double
 const conduit_node_set_path_double_ptr = catalyst_conduit_node_set_path_double_ptr
 
 const conduit_node_set_path_double_ptr_detailed = catalyst_conduit_node_set_path_double_ptr_detailed
+
+const conduit_node_set_path_external_char8_str = catalyst_conduit_node_set_path_external_char8_str
 
 const conduit_node_set_path_external_char_ptr = catalyst_conduit_node_set_path_external_char_ptr
 
@@ -2820,6 +2876,24 @@ const conduit_node_set_unsigned_short_ptr = catalyst_conduit_node_set_unsigned_s
 
 const conduit_node_set_unsigned_short_ptr_detailed = catalyst_conduit_node_set_unsigned_short_ptr_detailed
 
+const conduit_node_swap = catalyst_conduit_node_swap
+
+const conduit_node_to_json = catalyst_conduit_node_to_json
+
+const conduit_node_to_json_with_options = catalyst_conduit_node_to_json_with_options
+
+const conduit_node_to_string = catalyst_conduit_node_to_string
+
+const conduit_node_to_string_with_options = catalyst_conduit_node_to_string_with_options
+
+const conduit_node_to_summary_string = catalyst_conduit_node_to_summary_string
+
+const conduit_node_to_summary_string_with_options = catalyst_conduit_node_to_summary_string_with_options
+
+const conduit_node_to_yaml = catalyst_conduit_node_to_yaml
+
+const conduit_node_to_yaml_with_options = catalyst_conduit_node_to_yaml_with_options
+
 const conduit_node_total_bytes_allocated = catalyst_conduit_node_total_bytes_allocated
 
 const conduit_node_total_bytes_compact = catalyst_conduit_node_total_bytes_compact
@@ -2838,9 +2912,15 @@ const conduit_utils_set_info_handler = catalyst_conduit_utils_set_info_handler
 
 const conduit_utils_set_warning_handler = catalyst_conduit_utils_set_warning_handler
 
-const CONDUIT_VERSION = "0.7.2"
+const CONDUIT_VERSION = "0.8.3"
 
-const CONDUIT_GIT_SHA1 = "f54f834eb8aaff4fc97613e04cfdb360997867be"
+const CONDUIT_VERSION_MAJOR = 0
+
+const CONDUIT_VERSION_MINOR = 8
+
+const CONDUIT_VERSION_PATCH = 3
+
+const CONDUIT_GIT_SHA1 = "d8000c2d46b8ea968c2b7551cd0ce2af5b75b6da"
 
 const CONDUIT_SIZEOF_BYTE = 1
 
@@ -2966,9 +3046,9 @@ const CONDUIT_NATIVE_FLOAT_ID = 11
 
 const CONDUIT_NATIVE_DOUBLE_ID = 12
 
-const conduit_blueprint_about = catalyst_conduit_blueprint_about
+const CONDUIT_SIZEOF_INDEX_T = 8
 
-const conduit_blueprint_mcarray_examples_xyz = catalyst_conduit_blueprint_mcarray_examples_xyz
+const conduit_blueprint_about = catalyst_conduit_blueprint_about
 
 const conduit_blueprint_mcarray_is_interleaved = catalyst_conduit_blueprint_mcarray_is_interleaved
 
@@ -2980,23 +3060,19 @@ const conduit_blueprint_mcarray_verify = catalyst_conduit_blueprint_mcarray_veri
 
 const conduit_blueprint_mcarray_verify_sub_protocol = catalyst_conduit_blueprint_mcarray_verify_sub_protocol
 
-const conduit_blueprint_mesh_examples_basic = catalyst_conduit_blueprint_mesh_examples_basic
-
-const conduit_blueprint_mesh_examples_braid = catalyst_conduit_blueprint_mesh_examples_braid
-
-const conduit_blueprint_mesh_examples_julia = catalyst_conduit_blueprint_mesh_examples_julia
-
-const conduit_blueprint_mesh_examples_misc = catalyst_conduit_blueprint_mesh_examples_misc
-
-const conduit_blueprint_mesh_examples_polytess = catalyst_conduit_blueprint_mesh_examples_polytess
-
-const conduit_blueprint_mesh_examples_spiral = catalyst_conduit_blueprint_mesh_examples_spiral
+const conduit_blueprint_mesh_flatten = catalyst_conduit_blueprint_mesh_flatten
 
 const conduit_blueprint_mesh_generate_index = catalyst_conduit_blueprint_mesh_generate_index
+
+const conduit_blueprint_mesh_partition = catalyst_conduit_blueprint_mesh_partition
 
 const conduit_blueprint_mesh_verify = catalyst_conduit_blueprint_mesh_verify
 
 const conduit_blueprint_mesh_verify_sub_protocol = catalyst_conduit_blueprint_mesh_verify_sub_protocol
+
+const conduit_blueprint_table_verify = catalyst_conduit_blueprint_table_verify
+
+const conduit_blueprint_table_verify_sub_protocol = catalyst_conduit_blueprint_table_verify_sub_protocol
 
 const conduit_blueprint_verify = catalyst_conduit_blueprint_verify
 
