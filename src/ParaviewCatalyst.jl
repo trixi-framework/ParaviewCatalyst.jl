@@ -62,13 +62,12 @@ function catalyst_initialize(node::ConduitNode)
     return
 end
 
-function catalyst_initialize(;libpath=nothing)
+function catalyst_initialize(;libpath=nothing, catalyst_pipeline=nothing)
     @assert libpath !== nothing || haskey(ENV, "PARAVIEW_CATALYST_PATH") "please set the PARAVIEW_CATALYST_PATH Environment Variable to the path to your catalyst library (for example /home/USER_NAME/Paraview/ParaView-5.13.0-MPI-Linux-Python3.10-x86_64/lib/catalyst) or call the catalyst_initialize function with the path as a parameter libpath"
     ConduitNode() do node
 	    node["catalyst_load/implementation"] = "paraview"
 	    node["catalyst_load/search_paths/paraview"] = libpath === nothing ? ENV["PARAVIEW_CATALYST_PATH"] : libpath
-	    node["catalyst/scripts/catalyst_pipeline/filename"] = joinpath(@__DIR__, "catalyst_pipeline.py")
-	    # node["catalyst/scripts/catalyst_pipeline/filename"] = joinpath(@__DIR__, "catalyst state.py")
+	    node["catalyst/scripts/catalyst_pipeline/filename"] = catalyst_pipeline === nothing ? joinpath(@__DIR__, "catalyst_pipeline.py") : catalyst_pipeline
         catalyst_initialize(node)
     end
     return
@@ -95,7 +94,7 @@ end
 
 global CATALYST_TIME_INTERNAL = 0
 
-function catalyst_execute(;debuginfo = false)
+function catalyst_execute_example(;debuginfo = false)
     global CATALYST_TIME_INTERNAL
     ConduitNode() do node
         node["catalyst/state/timestep"] = CATALYST_TIME_INTERNAL
