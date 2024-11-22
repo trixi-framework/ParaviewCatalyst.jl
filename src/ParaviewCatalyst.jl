@@ -39,14 +39,6 @@ function error_status(status::API.catalyst_status)
     end
 end
 
-baremodule Defaults
-
-const PARAVIEW_CATALYST_PATHS = [
-    "/home/jake/Paraview/build/lib/catalyst",
-    "/home/jake/ParaView-5.10.0-MPI-Linux-Python3.9-x86_64/lib/catalyst",
-]
-end
-
 function catalyst_io_pipeline!(node::ConduitNode; filename="", channel="input")
 	node["catalyst/pipelines/output/type"] = "io"
 	node["catalyst/pipelines/output/channel"] = channel
@@ -62,11 +54,13 @@ function catalyst_initialize(node::ConduitNode)
     return
 end
 
-function catalyst_initialize(;libpath=nothing)
+function catalyst_initialize(;libpath=nothing, catalyst_pipeline=nothing)
+    @assert libpath !== nothing || haskey(ENV, "PARAVIEW_CATALYST_PATH")
+        "please set the PARAVIEW_CATALYST_PATH environment variable to the path of your catalyst library or use the libpath parameter of catalyst_initialize"
     ConduitNode() do node
 	    node["catalyst_load/implementation"] = "paraview"
-	    node["catalyst_load/search_paths/paraview"] = libpath === nothing ? Defaults.PARAVIEW_CATALYST_PATHS[2] : libpath
-	    node["catalyst/scripts/catalyst_pipeline/filename"] = joinpath(@__DIR__, "catalyst_pipeline.py")
+	    node["catalyst_load/search_paths/paraview"] = libpath === nothing ? ENV["PARAVIEW_CATALYST_PATH"] : libpath
+	    node["catalyst/scripts/catalyst_pipeline/filename"] = catalyst_pipeline === nothing ? joinpath(@__DIR__, "catalyst_pipeline.py") : catalyst_pipeline
         catalyst_initialize(node)
     end
     return
@@ -89,23 +83,6 @@ function catalyst_execute(node::ConduitNode)
         error_status(status)
     end
     return node
-end
-function catalyst_execute(;debuginfo = false)
-    ConduitNode() do node
-        node["catalyst/state/timestep"] = 0
-        node["catalyst/state/time"] = 0.0
-        node["catalyst/channels/input/type"] = "mesh"
-        Conduit.example_braid_mesh() do mesh_node
-            node["catalyst/channels/input/data"] = mesh_node
-        end
-        if debuginfo
-            Conduit.node_info(node) do info_node
-                Conduit.node_print(info_node)
-            end
-        end
-        catalyst_execute(node)
-    end
-    return
 end
 
 function catalyst_results(node::ConduitNode)
