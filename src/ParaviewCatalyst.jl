@@ -112,7 +112,7 @@ end
 function catalyst_finalize()
     ConduitNode() do node
         catalyst_finalize(node)
-	    Conduit.node_print(node, detailed=false)
+	    Conduit.node_print(node)
     end
 end
 
