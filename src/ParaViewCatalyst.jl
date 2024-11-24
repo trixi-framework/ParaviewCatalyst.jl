@@ -1,4 +1,4 @@
-module ParaviewCatalyst
+module ParaViewCatalyst
 
 import Catalyst_jll
 

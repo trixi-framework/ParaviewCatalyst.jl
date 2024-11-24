@@ -1,5 +1,5 @@
-# ParaviewCatalyst.jl
-ParaviewCatalyst.jl provides a Julia interface to Catalyst, used for in-situ
+# ParaViewCatalyst.jl
+ParaViewCatalyst.jl provides a Julia interface to Catalyst, used for in-situ
 visualization of simulation data.  
 The Catalyst library for Julia is provided by Catalyst_jll.jl at
 [JuliaBinaryWrappers](https://github.com/JuliaBinaryWrappers/Catalyst_jll.jl/blob/main/src/Catalyst_jll.jl)
@@ -19,7 +19,7 @@ Its path has to be set as an environment variable, e.g. by
 ```bash
 export CATALYST_IMPLEMENTATION_PATHS=<path_to_libcatalyst-paraview.so>
 ```
-Alternatively, when using ParaviewCatalyst.jl from your own application, you can use the keyword argument `libpath` of the function `catalyst_initialize`.
+Alternatively, when using ParaViewCatalyst.jl from your own application, you can use the keyword argument `libpath` of the function `catalyst_initialize`.
 
 ### Testing
 
@@ -55,7 +55,7 @@ select "testdata". Now select "Catalyst" from the main menu and "Continue". The 
 should change its color every two seconds.
 
 ### Using the interface
-To use ParaviewCatalyst.jl from your code, you only need `catalyst_initialize()`,
+To use ParaViewCatalyst.jl from your code, you only need `catalyst_initialize()`,
 `catalyst_execute(node)`, and `catalyst_finalize()`. All information is passed
 through Conduit nodes, which are required to adhere to the
 [Blueprint](https://docs.paraview.org/en/latest/Catalyst/blueprints.html).
@@ -69,12 +69,12 @@ Once a pipeline in ParaView has been set up, it can be exported as a script by s
 
 
 ## Examples
-ParaviewCatalyst.jl is used by [Trixi.jl](https://github.com/trixi-framework/Trixi.jl).
+ParaViewCatalyst.jl is used by [Trixi.jl](https://github.com/trixi-framework/Trixi.jl).
 
 ## Authors
-ParaviewCatalyst.jl was initiated by Jake Bolewski (@jakebolewski) at https://github.com/CliMA/
+ParaViewCatalyst.jl was initiated by Jake Bolewski (@jakebolewski) at https://github.com/CliMA/
 and is now maintained at https://github.com/trixi-framework.
 
 
 ## License
-ParaviewCatalyst.jl is licensed under the MIT license (see [LICENSE.md](LICENSE.md)).
+ParaViewCatalyst.jl is licensed under the MIT license (see [LICENSE.md](LICENSE.md)).
