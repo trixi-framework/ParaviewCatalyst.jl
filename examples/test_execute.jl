@@ -1,4 +1,4 @@
-using ParaviewCatalyst
+using ParaViewCatalyst
 
 catalyst_initialize()
 
