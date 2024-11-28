@@ -90,7 +90,7 @@ at https://github.com/CliMA and is now maintained by
 Germany).
 
 
-## License
+## License and contributing
 ParaViewCatalyst.jl is licensed under the MIT license (see [LICENSE.md](LICENSE.md)).  Since
 ParaViewCatalyst.jl is an open-source project, we are very happy to accept contributions from the
 community. Note that we strive to be a friendly, inclusive open-source community and ask all members
