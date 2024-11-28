@@ -24,7 +24,6 @@ open(joinpath(@__DIR__, "src", "index.md"), "w") do io
     """)
     # Write the modified contents
     for line in eachline(joinpath(paraviewcatalyst_root_dir, "README.md"))
-        line = replace(line, "## License" => "## [License](@id doc-license)")
         line = replace(line, "[LICENSE.md](LICENSE.md)" => "[License](@ref)")
         println(io, line)
     end
