@@ -13,7 +13,7 @@
 used for in-situ visualization of simulation data.  
 The Catalyst library for Julia is provided automatically as a precompiled binary by Catalyst\_jll.jl
 at
-[JuliaBinaryWrappers](https://github.com/JuliaBinaryWrappers/Catalyst_jll.jl/blob/main/src/Catalyst_jll.jl)
+[JuliaBinaryWrappers](https://github.com/JuliaBinaryWrappers/Catalyst_jll.jl)
 and [Yggdrasil](https://github.com/JuliaPackaging/Yggdrasil/tree/master/C/Catalyst).
 
 
