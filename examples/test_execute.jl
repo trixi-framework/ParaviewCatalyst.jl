@@ -1,4 +1,4 @@
-using ParaviewCatalyst
+using ParaViewCatalyst
 
 catalyst_initialize()
 
@@ -23,10 +23,10 @@ for t in 1:10
         mesh_node["topologies/mesh/elements/shape"] = "hex"
         mesh_node["topologies/mesh/elements/connectivity"] = [0 1 3 2 4 5 7 6]
 
-        mesh_node["fields/pressure/association"] = "element"
-        mesh_node["fields/pressure/topology"] = "mesh"
-        mesh_node["fields/pressure/volume_dependent"] = "false"
-        mesh_node["fields/pressure/values"] = rand(1)
+        mesh_node["fields/testdata/association"] = "element"
+        mesh_node["fields/testdata/topology"] = "mesh"
+        mesh_node["fields/testdata/volume_dependent"] = "false"
+        mesh_node["fields/testdata/values"] = rand(1)
 
         node["catalyst/channels/input/data"] = mesh_node
         
