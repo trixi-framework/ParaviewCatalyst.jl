@@ -55,12 +55,17 @@ function catalyst_initialize(node::ConduitNode)
 end
 
 function catalyst_initialize(;libpath=nothing, catalyst_pipeline=nothing)
-    @assert libpath !== nothing || haskey(ENV, "PARAVIEW_CATALYST_PATH")
-        "please set the PARAVIEW_CATALYST_PATH environment variable to the path of your catalyst library or use the libpath parameter of catalyst_initialize"
+    @assert libpath !== nothing || haskey(ENV, "CATALYST_IMPLEMENTATION_PATHS") "
+        set CATALYST_IMPLEMENTATION_PATHS environment variable to the path of your catalyst library
+        or use the libpath parameter of catalyst_initialize"
     ConduitNode() do node
 	    node["catalyst_load/implementation"] = "paraview"
-	    node["catalyst_load/search_paths/paraview"] = libpath === nothing ? ENV["PARAVIEW_CATALYST_PATH"] : libpath
-	    node["catalyst/scripts/catalyst_pipeline/filename"] = catalyst_pipeline === nothing ? joinpath(@__DIR__, "catalyst_pipeline.py") : catalyst_pipeline
+        if libpath !== nothing
+	        node["catalyst_load/search_paths/paraview"] = libpath
+        end
+	    node["catalyst/scripts/catalyst_pipeline/filename"] =
+            catalyst_pipeline === nothing ?
+            joinpath(@__DIR__, "catalyst_pipeline.py") : catalyst_pipeline
         catalyst_initialize(node)
     end
     return
