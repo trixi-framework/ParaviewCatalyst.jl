@@ -76,7 +76,7 @@ keyword argument `catalyst_pipeline`. By default src/catalyst_pipeline.py is use
 activates live visualization. The data can also be viewed on a remote machine. In this case
 `options.CatalystLiveURL` has to be adjusted to point to the remote machine.
 Once a pipeline in ParaView has been set up, it can be exported as a script by selecting
-"File" from the main menu and then "Save Catalyst State". It might be required to modifiy
+"File" from the main menu and then "Save Catalyst State". It might be required to modify
 this file afterwards.
 
 
