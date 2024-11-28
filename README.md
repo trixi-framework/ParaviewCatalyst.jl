@@ -14,7 +14,7 @@ ParaView, this package is geared towards the
 [ParaView implementation](https://docs.paraview.org/en/latest/Catalyst) of the Catalyst API.
 As such ParaView needs to be present on the machine you run your simulation on. In
 particular, a version is required that ships the Catalyst implementation as a library. On
-Linux you should look for `libcatalyst-paraview.so`.  
+Linux you should look for `libcatalyst-paraview.so`.
 Its path has to be set as an environment variable, e.g. by
 ```bash
 export CATALYST_IMPLEMENTATION_PATHS=<path_to_libcatalyst-paraview.so>
@@ -61,11 +61,12 @@ through Conduit nodes, which are required to adhere to the
 [Blueprint](https://docs.paraview.org/en/latest/Catalyst/blueprints.html).
 
 A user-defined ParaView pipeline script can be passed to `catalyst_initialize` using the
-keyword argument `catalyst_pipeline`. By default src/catalyst_pipeline.py is used. This
-script activates live visualization. The data can also be viewed on a remote machine. In
-this case `options.CatalystLiveURL` has to be adjusted to point to the remote machine.
+keyword argument `catalyst_pipeline`. By default src/catalyst_pipeline.py is used, which
+activates live visualization. The data can also be viewed on a remote machine. In this case
+`options.CatalystLiveURL` has to be adjusted to point to the remote machine.
 Once a pipeline in ParaView has been set up, it can be exported as a script by selecting
-"File" from the main menu and then "Save Catalyst State".
+"File" from the main menu and then "Save Catalyst State". It might be required to modifiy
+this file afterwards.
 
 
 ## Examples
