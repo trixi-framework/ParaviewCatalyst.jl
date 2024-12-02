@@ -1,7 +1,7 @@
 name = "ParaViewCatalyst"
 uuid = "0fa3a46a-29f8-4c04-a671-08df7e71e505"
 authors = ["Jake Bolewski <jakebolewski@gmail.com>", "Benedict Geihe <bgeihe@uni-koeln.de>"]
-version = "0.1.0"
+version = "0.1.1-DEV"
 
 [deps]
 Catalyst_jll = "513fda4f-8b2e-59b2-a185-097ac7c26d11"
