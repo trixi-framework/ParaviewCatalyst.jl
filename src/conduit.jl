@@ -9,6 +9,10 @@ struct ConduitNode
 	    nptr = API.conduit_node_create()
 	    return new(nptr)
     end
+
+    function ConduitNode(ptr::Ptr{API.conduit_node})
+        return new(ptr)
+    end
 end
 Base.unsafe_convert(::Type{Ptr{API.conduit_node}}, node::ConduitNode) = node.ptr
 
@@ -23,11 +27,24 @@ function ConduitNode(f::Function)
 end
 
 Base.setindex!(node::ConduitNode, val, path::String) = node_set!(node, path, val)
+Base.getindex(node::ConduitNode, path::String) = node_get(node, path)
+
+function node_get(node::ConduitNode, path::String)
+    if !node_has_path(node, path)
+        throw(KeyError(path))
+    end
+    node_at_path = API.conduit_node_fetch(node, path)
+    dtype = API.conduit_node_dtype(node_at_path)
+    dtypename = Symbol(unsafe_string(API.conduit_datatype_name(dtype)))
+    return node_get(node_at_path, Val(dtypename))
+end
 
 for numtype in (:UInt8, :Int8, :UInt16, :Int16, :UInt32, :Int32, :UInt64, :Int64, :Float32, :Float64)
     cnumtype = Symbol(lowercase("$(numtype)"))
     node_set_path = Symbol("conduit_node_set_path_$(cnumtype)")
     node_set_path_ptr = Symbol("conduit_node_set_path_$(cnumtype)_ptr")
+    node_as = Symbol("conduit_node_as_$(cnumtype)")
+    node_as_ptr = Symbol("conduit_node_as_$(cnumtype)_ptr")
     @eval begin
         function node_set!(node::ConduitNode, path::String, val::$numtype)
             API.$node_set_path(node, path, val)
@@ -36,6 +53,12 @@ for numtype in (:UInt8, :Int8, :UInt16, :Int16, :UInt32, :Int32, :UInt64, :Int64
         function node_set!(node::ConduitNode, path::String, val::Array{$numtype})
             API.$node_set_path_ptr(node, path, pointer(val), length(val))
             return node
+        end
+        function node_get(nodeptr::Ptr{API.conduit_node}, ::$(Val{cnumtype}))
+            return API.$node_as(nodeptr)
+        end
+        function node_get(nodeptr::Ptr{API.conduit_node}, ::$(Val{Array{cnumtype}}))
+            return API.$node_as_ptr(nodeptr)
         end
     end
 end
@@ -48,6 +71,14 @@ end
 function node_set!(node::ConduitNode, path::String, val::ConduitNode)
     API.conduit_node_set_path_node(node, path, val)
     return node
+end
+
+function node_get(nodeptr::Ptr{API.conduit_node}, ::Val{:object})
+    return ConduitNode(nodeptr)
+end
+
+function node_get(nodeptr::Ptr{API.conduit_node}, ::Val{:char8_str})
+    return unsafe_string(API.conduit_node_as_char8_str(nodeptr))
 end
 
 function node_has_path(node::ConduitNode, path::String)
